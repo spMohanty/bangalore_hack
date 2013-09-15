@@ -1,0 +1,217 @@
+<!DOCTYPE html> 
+<html manifest="manifest.appcache"> 
+	<head> 
+        <title>APPLICATION NAME</title> 
+        
+        <!-- WEB SEARCH META TAGS -->
+        <meta charset="utf-8">
+        <meta name="robots" content="index,follow" />
+        <meta name="keywords" content="keywords,keywords,keyword" />
+        <meta name="description" content="Description of the app" />
+        <meta name="author" content="Daniele Veneroni (@Venerons)">
+        <link rel="shortcut icon" href="img/icons/webapp/icon64.png">
+        
+        <!-- SAFARI WEB APP META TAGS -->
+        <meta content="yes" name="apple-mobile-web-app-capable" />
+        <meta content="black" name="apple-mobile-web-app-status-bar-style" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+        <!-- iPhone -->
+        <link href="img/icons/ios/icon57.png" sizes="57x57" rel="apple-touch-icon">
+        <link href="img/splash/ios/splash320x460.png" media="(device-width: 320px) and (device-height: 480px)
+                 and (-webkit-device-pixel-ratio: 1)" rel="apple-touch-startup-image">
+
+        <!-- iPhone (Retina) -->
+        <link href="img/icons/ios/icon114.png" sizes="114x114" rel="apple-touch-icon">
+        <link href="img/splash/ios/splash640x920.png" media="(device-width: 320px) and (device-height: 480px)
+                 and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
+
+        <!-- iPhone 5 -->
+        <link href="img/splash/ios/splash640x1096.png" media="(device-width: 320px) and (device-height: 568px)
+                 and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
+
+        <!-- iPad -->
+        <link href="img/icons/ios/icon72.png" sizes="72x72" rel="apple-touch-icon">
+        <link href="img/splash/ios/splash768x1004.png" media="(device-width: 768px) and (device-height: 1024px)
+                 and (orientation: portrait)
+                 and (-webkit-device-pixel-ratio: 1)" rel="apple-touch-startup-image">
+        <link href="img/splash/ios/splash748x1024.png" media="(device-width: 768px) and (device-height: 1024px)
+                 and (orientation: landscape)
+                 and (-webkit-device-pixel-ratio: 1)" rel="apple-touch-startup-image">
+
+        <!-- iPad (Retina) -->
+        <link href="img/icons/ios/icon144.png" sizes="144x144" rel="apple-touch-icon">
+        <link href="img/splash/ios/splash1536x2008.png" media="(device-width: 768px) and (device-height: 1024px)
+                 and (orientation: portrait)
+                 and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
+        <link href="img/splash/ios/splash1496x2048.png" media="(device-width: 768px) and (device-height: 1024px)
+                 and (orientation: landscape)
+                 and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
+            
+        <!-- ADD2HOME META TAGS -->
+        <link rel="stylesheet" href="js/lib/add2home.css">
+        <script type="application/javascript" src="js/lib/add2home.js"></script>
+
+        <!-- JQUERY -->
+        <script type="application/javascript" src="js/lib/jquery-2.0.0.js"></script>
+
+        <link rel="stylesheet" href="css/jquery.mobile-1.3.2.min.css" />
+        <script src="js/lib/jquery.mobile-1.3.2.min.js"></script>
+
+        <script type="text/javascript">
+            $(document).ready(function(){
+
+  
+
+
+            var client_id = "null";
+            var my_hardware_id = "something_somethingdkja23898092381"; //Change in Phonegap to UUID
+            // var serverBaseUrl = "http://ec2-54-211-226-94.compute-1.amazonaws.com:3000";
+            var serverBaseUrl = "http://172.16.17.157:3000";
+
+            var register_client = "register-client";
+            var get_job_uri = "get-job";
+            var done_job_uri = "done-job";
+
+            //Register device
+
+            //State variables
+            var do_I_have_a_job = false;
+            var current_job ;
+            var status = "paused";
+            //State variables end
+
+            //Helper functions
+            function validate_input_fields(){
+
+                if( $("#email_id").val() && $("#email_id").val().trim() != "" )
+                {
+                    //Update hardware_id
+                    hardware_id = $("#email_id").val();
+                    client_id = hardware_id;
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+            //Helper functions end  
+
+
+
+            //First register your client
+            // $.post(serverBaseUrl+"/"+register_client, {client_id:my_hardware_id, device_name: "BROWSER"}, function(data){
+            //         client_id = data.client_id;
+            // });
+
+            //Check if you have a job, else request for a JON
+            function check_if_I_need_a_job(){
+
+                    if(validate_input_fields()  && !do_I_have_a_job  && status!="paused"){
+                            //Request for a job
+
+                            console.log("Request for Job !!");
+                            $.post(serverBaseUrl+"/"+get_job_uri, {client_id:client_id, points_per_job : $("input[name=points_per_job]:checked").val() }, function(data){
+                                    //update score
+                                    
+
+                                    if(data.status == "available"){
+                                    console.log(data);
+
+                                    //Change do_I_have_a_job
+                                    do_I_have_a_job = true;
+                                    current_job = data.job_id;
+                                    //Execute it
+                                    eval(data.code);
+                                    var result = g(data.input.obj);
+                                    console.log(result);
+
+                                    //Post back the result to server
+                                    $.post(serverBaseUrl+"/"+done_job_uri, {result:result, client_id:client_id, job_id:current_job}, function(data){
+                                        //Update Score 
+
+                                    });
+
+                                    //Change state to tell I do not have a job
+                                    do_I_have_a_job = false;
+                                    }else{
+                                        //Code for when no jobs
+                                    }
+
+                            });
+
+                    }
+            }
+
+
+            check_if_I_need_a_job();
+            var job_check_interval = setInterval(check_if_I_need_a_job,100);
+
+
+            $("#control_button").click(function(){
+                if(validate_input_fields()){
+                if($(this).attr("value") == "Start Job"){
+                    status = "running";
+                    $(this).attr("value", "Stop Job");
+                    $("#email_id").textinput('disable');
+                }else{
+                    status = "paused";
+                    $(this).attr("value","Start Job");   
+                    $("#email_id").textinput('enable');
+
+                }                              
+
+                $("#control_button").button('refresh');
+            }
+            });
+
+        });
+        </script>
+
+    </head> 
+    <body> 
+        
+        App Content
+
+        <!-- Home -->
+        <div data-role="page" id="page1">
+            <div data-theme="a" data-role="header">
+                <h3>
+                    Beach !!
+                </h3>
+            </div>
+            <div data-role="content">
+                <h4 id="score">
+                    Amount Earned : --
+                </h4>
+                <div data-role="fieldcontain">
+                    <label for="email_id">
+                        Email-ID
+                    </label>
+                    <input name="email_id" id="email_id" placeholder="" value=""
+                    type="email" data-mini="true">
+                </div>
+                <div data-role="fieldcontain">
+                    <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true" id="points_per_job">
+                        <legend>
+                            Points / Job
+                        </legend>
+                        <input id="radio1" name="points_per_job" value="10" data-theme="a" type="radio" checked="checked">
+                        <label for="radio1">
+                            10
+                        </label>
+                        <input id="radio2" name="points_per_job" value="20" data-theme="a" type="radio">
+                        <label for="radio2">
+                            20
+                        </label>
+                        <input id="radio3" name="points_per_job" value="30" data-theme="a" type="radio">
+                        <label for="radio3">
+                            30
+                        </label>
+                    </fieldset>
+                </div>
+                <input id="control_button" type="submit" data-theme="b" value="Start Job">
+            </div>
+        </div>
+        
+    </body>
+</html>
