@@ -130,6 +130,8 @@
                                         //Update Score 
                                         $("#score").text("Amount Earned : " + data.score );
 
+                                    }).fail(function(){
+                                        console.log("Something went wrong when submitting results :'(");
                                     });
 
                                     //Change state to tell I do not have a job
@@ -139,6 +141,8 @@
                                         //console.job("")
                                     }
 
+                            }).fail(function(){
+                                console.log("Something went wrong :'(");
                             });
 
                     }
