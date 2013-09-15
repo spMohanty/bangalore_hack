@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../../assets/ico/favicon.png">
+
+    <title>Starter Template for Bootstrap</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="bootstrap.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="starter-template.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="../../assets/js/html5shiv.js"></script>
+      <script src="../../assets/js/respond.min.js"></script>
+    <![endif]-->
+
+    <script type="text/javascript" src='jquery-2.0.0.js'></script>
+<!-- Jquery -->
+
+<script>		
+
+
+		
+      var clientList ;
+
+      $(document).ready(function(){
+
+      var U = function update(){
+			$.get("http://ec2-54-211-226-94.compute-1.amazonaws.com:3000/client_list",
+				function(data)
+				{
+
+				  clientList = data;
+
+          //Clear Main DIv !!
+
+          //Sort It
+
+          $("#MainContainer").html('');
+          //insert individual records
+
+          //Sort here !!!!
+
+
+          $.each(clientList, function(key,value) {
+            $("#MainContainer").append("<div class='col-xs-4' ><table border='0'  align='center'><tr><td class='avatar'><img src='clientimages/1.jpg' width='120px'></td><td  class='data'><b>Client-ID :</b>"+key+"<br><br><b>Earnings:<b>"+value+"</td><br></tr></table></div>");
+          });
+
+			});
+    }
+        U();
+        var intervalVar = setInterval(U,100);
+
+  });
+
+</script>
+
+
+
+<style>
+.key-value
+{
+border-spacing:5px 10px;
+       text-align:center;
+}
+
+#thead
+{
+	font-size:18px;
+}
+.data
+{
+	vertical-align:top;
+width:600px;
+}
+.avatar
+{
+	vertical-align:top;
+        width:150px;
+}
+
+#row
+{
+
+height:80px;
+       font-size:16px;
+}
+
+
+
+body
+{
+	background-image:url('bg.jpg');
+}
+
+</style>
+
+  </head>
+
+
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"  style="position:relative;  left:100px;"><a href="records.html">Client Records</a></li>
+	    <li>
+        <div  >
+          <h1  style="font-size:20px; position:relative; left:300px"><a href="#"<b>Beach Management</b></a></h1>
+        </div>
+	</li>
+            <li><a href="job-status.html"  style="position:relative;  left:500px;">Job Status</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+      <div id="MainContainer"></div>
+
+
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <!-- // <script src="../../assets/js/jquery.js"></script> -->
+    <!-- // <script src="../../dist/js/bootstrap.min.js"></script> -->
+  </body>
+</html>
