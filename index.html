@@ -66,8 +66,8 @@
 
             var client_id = "null";
             var my_hardware_id = "something_somethingdkja23898092381"; //Change in Phonegap to UUID
-            // var serverBaseUrl = "http://ec2-54-211-226-94.compute-1.amazonaws.com:3000";
-            var serverBaseUrl = "http://172.16.17.157:3000";
+            var serverBaseUrl = "http://ec2-54-211-226-94.compute-1.amazonaws.com:3000";
+            // var serverBaseUrl = "http://172.16.17.157:3000";
 
             var register_client = "register-client";
             var get_job_uri = "get-job";
@@ -112,22 +112,23 @@
                             console.log("Request for Job !!");
                             $.post(serverBaseUrl+"/"+get_job_uri, {client_id:client_id, points_per_job : $("input[name=points_per_job]:checked").val() }, function(data){
                                     //update score
-                                    
+
 
                                     if(data.status == "available"){
-                                    console.log(data);
 
                                     //Change do_I_have_a_job
                                     do_I_have_a_job = true;
                                     current_job = data.job_id;
-                                    //Execute it
+                                    //Execute payload
                                     eval(data.code);
                                     var result = g(data.input.obj);
                                     console.log(result);
 
                                     //Post back the result to server
                                     $.post(serverBaseUrl+"/"+done_job_uri, {result:result, client_id:client_id, job_id:current_job}, function(data){
+                                        console.log(data);
                                         //Update Score 
+                                        $("#score").text("Amount Earned : " + data.score );
 
                                     });
 
@@ -135,6 +136,7 @@
                                     do_I_have_a_job = false;
                                     }else{
                                         //Code for when no jobs
+                                        //console.job("")
                                     }
 
                             });
